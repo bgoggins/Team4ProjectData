@@ -14,16 +14,19 @@ node {
     }
     
     stage("Docker - Build image") {
+        sh 'eval $(minikube -p minikube docker-env)'
     	sh 'docker build --rm -t team4-data-jenkins:v1.0 .'
     	sh 'docker images'
     }
     
     stage("Docker - Deployment") {
+        sh 'eval $(minikube -p minikube docker-env)'
     	sh 'kubectl create deployment team4-data-jenkins --image=team4-data-jenkins:v1.0'
     	sh 'kubectl get all'
     }
     
     stage("Minikube - Expose") {
+        sh 'eval $(minikube -p minikube docker-env)'
     	sh 'kubectl expose deployment team4-data-jenkins --type=LoadBalancer --port=8080'
     	sh 'kubectl get all'
     }
