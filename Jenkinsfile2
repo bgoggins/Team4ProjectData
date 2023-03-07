@@ -1,0 +1,46 @@
+node {
+    stage ("Checkout DataService"){
+        git branch: 'main', url: 'https://github.com/bgoggins/Team4ProjectData.git'
+    }
+    
+    stage ("Minikube - Start"){
+    	sh 'minikube start'
+    	sh 'minikube status'
+    }
+    
+    stage ("Minikube - Into Docker"){
+    	sh 'minikube docker-env'
+    	sh 'eval $(minikube -p minikube docker-env)'
+    }
+    
+    stage("Docker - Build image") {
+    	sh 'docker build --rm -t team4-data:v1.0 .'
+    	sh 'docker images'
+    }
+    
+    stage("Docker - Deployment") {
+    	sh 'kubectl create deployment team4-data --image=team4-data:v1.0'
+    	sh 'kubectl get all'
+    }
+    
+    stage("Minikube - Expose") {
+    	sh 'kubectl expose deployment team4-data --type=LoadBalancer --port=8080
+    	sh 'kubectl get all'
+    }
+        
+    stage('User Acceptance Test - DataService') {
+	
+	  def response= input message: 'Is this build good to go?',
+	   parameters: [choice(choices: 'Yes\nNo', 
+	   description: '', name: 'Pass')]
+	
+	  if(response=="Yes") {
+
+	    stage('Release- DataService') {
+		 sh "docker stop team4-data"
+	     sh 'echo MCC DataService is ready to release!'
+
+	    }
+	  }
+    }
+}
