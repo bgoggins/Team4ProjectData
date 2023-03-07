@@ -24,7 +24,7 @@ node {
     }
     
     stage("Minikube - Expose") {
-    	sh 'kubectl expose deployment team4-data --type=LoadBalancer --port=8080
+    	sh 'kubectl expose deployment team4-data --type=LoadBalancer --port=8080'
     	sh 'kubectl get all'
     }
         
